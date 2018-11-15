@@ -1,0 +1,29 @@
+ Django应用中集成百度Ueditor HTML编辑器
+ Django提供了DjangoUeditor第三方富文本库
+
+
+ 1. 安装和配置
+
+    将DjangoUeditor文件夹拷贝extra_apps下
+
+    配置：
+    （1）将如下信息加入到INSTALLED_APPS应用注册表中
+      'DjangoUeditor',
+
+    （2）在主工程的urls.py中加入DjangoUeditor路由规则
+      url(r'^ueditor/',include('DjangoUeditor.urls')),
+
+    （3）在应用的models.py中对相关的富文本字段进行定义
+       from DjangoUeditor.models import UEditorField
+       在models类中加入字段定义
+       a_content = UEditorField(verbose_name="文章内容", width=1000, height=600,
+							 imagePath="media/arts_ups/ueditor/",
+							 filePath="media/arts_ups/ueditor/",
+							 blank=True, toolbars="full", default='')
+
+    （4）在admin.py的模型定制类中加入类型声明
+         style_fields = {'a_content': 'ueditor'}
+
+
+    启动服务：
+        进入对应的xadmin的后台数据模型管理输入端，就可以看到富文本功能

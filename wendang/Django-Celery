@@ -1,0 +1,131 @@
+
+
+
+Django-Celery安装使用手册
+
+（1）安装django-clery
+   pip   install   django-celery==3.2.2
+
+
+（2）在settings.py中添加django应用
+
+    MY_APPS = [
+
+        'djcelery',
+    ]
+
+    数据迁移：
+    python  manage.py   makemigrations   [app_name]    ---- 产生mysql临时迁移表
+    python  manage.py   migrate          [app_name]    ---- 将临时表迁移到db库中
+
+
+（3）可以看到djcelery选项
+    python manage.py 回车
+    可以看到djcelery选项
+
+
+（4） 在django的主工程中创建celery.py文件
+
+    由Celery类产生application对象app， app用于produce数据给tasks
+    通过autodiscover_tasks函数配置自动发现app应用中的tasks.py文件
+
+    from __future__ import absolute_import
+
+    import os
+    from celery import Celery
+    from WH1803Django import settings
+
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WH1803Django.settings')
+
+    app = Celery('django_proj', backend='redis', broker=settings.CELERY_BROKER_URL)
+
+    app.config_from_object('django.conf:settings')
+
+    app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
+
+  (5) 修改配置文件settings.py
+
+        ############### celery settings begin #############
+        '''
+        celery是分布式异步消息队列处理框架
+        以redis作为MQ数据存储和转发
+        '''
+        REDIS_DEPLOY_FLAG = "test"
+
+        REDIS_SERVICE={
+            'test':('127.0.0.1', '6379'),
+            'online':('192.168.11.11', '10379'),
+        }
+
+        CELERY_BROKER_URL = 'redis://%s:%s/1' % (REDIS_SERVICE[REDIS_DEPLOY_FLAG][0],
+                                                 REDIS_SERVICE[REDIS_DEPLOY_FLAG][1])
+
+        CELERY_ACCEPT_CONTENT = ['json']
+
+        CELERY_TASK_SERIALIZER = 'json'
+
+        #CELERY_RESULT_BACKEND = 'django-db'
+
+        CELERY_RESULT_BACKEND = 'redis://%s:%s/2' % (REDIS_SERVICE[REDIS_DEPLOY_FLAG][0],
+                                                 REDIS_SERVICE[REDIS_DEPLOY_FLAG][1])
+
+        #部署的django服务的IP和端口
+        DJANGO_SERVICE = ('127.0.0.1',8000)
+
+        import redis
+
+        R = redis.Redis(host='127.0.0.1', port=6379, db=0)
+
+
+        CACHES = {
+            'default': {
+                "BACKEND": "django_redis.cache.RedisCache",
+                "LOCATION": "redis://%s:%s/1" % (REDIS_SERVICE[REDIS_DEPLOY_FLAG][0],
+                                                 REDIS_SERVICE[REDIS_DEPLOY_FLAG][1]),
+                "OPTIONS": {
+                    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                }
+            }
+        }
+
+        ############### celery settings end #############
+
+
+
+ （6）将4步骤中的app应用导出到django工程中
+
+    在主工程的__init__.py中加入如下信息：
+
+
+    from WH1803Django.celery import app as celery_app
+
+
+    __all__ = ['celery_app']
+
+
+  (7) 在apps下的app应用中创建tasks.py文件， 加入耗时任务逻辑操作
+
+    from celery import shared_task, task
+
+    @task
+    def say_hello(str):
+        sleep(1)
+        print("say hello.")
+        r = settings.R
+        r.set("celery_hello", 'hello, ' + str)
+        return  str
+
+
+
+  （8）编写启动celery worker脚本
+     创建start_celery.sh文件，内容如下：
+
+     #!/bin/bash
+
+     #启动django-celery服务的启动脚本
+
+     python manage.py celery worker -l info
+
+
+

@@ -1,0 +1,21 @@
+{% load staticfiles %}
+<div>
+    <span style="background-color: forestgreen;font-size:50px;margin:100px;">书</span>
+    <span style="font-size: 50px;">全书网</span>
+</div>
+<div class="top_main">
+            <form action="{% url 'search' %}" method="post">
+            <div class="form-group">
+                {% csrf_token %}
+                <label class="sr-only" for="exampleInputAmount"></label>
+                <div class="input-group">
+                    <input name="keyword" type="text" class="form-control" id="exampleInputAmount" placeholder="武神天尊">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">搜书</button>
+        </form>
+    <div class="classify">
+
+    </div>
+</div>
+

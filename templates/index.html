@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+
+{% block title %}
+    首页
+{% endblock %}
+{% block page_head %}
+<div class="col-md-12">
+    <div style="margin: 10px">
+        {% for na in nacavit %}
+            <span style="font-size: 20px;">
+                <a href="{% url 'deta' %}?class_id={{ na.home_id }}">
+                {{ na.home_title }}</a>
+            </span>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block page_content %}
+
+
+    <div class="row">
+        <div class="col-md-8 clearfix" >
+
+            <div>
+                {% for datali in datali_list %}
+                <div class=" pull-left" style="margin-right: 10px">
+                    <img src="{{ datali.image_url }}" style="width:100px;height:100px">
+                    <h4>{{ datali.details_title }}</h4>
+                    <h4>{{ datali.details_zz}}</h4>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+{% block page_footer %}
+
+{% endblock %}
+
+<!-- 分类菜单与轮播 -->

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% include 'include/page_search.html' %}
+
+{% block page_content %}
+
+    <div>
+    <div>
+        {% for book in book_nav %}
+            <a href="?class_id={{ book.home_id }}"><sapn>{{ book.home_title }}</sapn>|</a>
+        {% endfor %}
+    </div>
+
+    <div>
+        {% for book in book_detail_list %}
+            <a href="{% url 'data_li' %}?details_id={{ book.details_id }}">
+               <span><img src="{{ book.image_url }}" style="width: 150px;height: 150px"></span>
+                <span style="float:top">{{ book.details_title }}</span>
+                <span>{{ book.details_zz }}</span>
+            </a>
+         {% endfor %}
+    </div>
+
+    <div class="pagination">
+      <ul style="list-style-type: none;">
+        <li><a href="#">上一页</a></li>
+        <li><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li><a href="#">下一页</a></li>
+      </ul>
+    </div>
+</div>
+
+{% endblock %}

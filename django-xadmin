@@ -1,0 +1,99 @@
+django xadmin 引入和使用
+
+
+
+1. xadmin引入。
+    从https://github.com/nocmt/Xadmin1.11.x.git下载xadmin
+   将xadmin第三方库目录拷贝到extra_apps目录下。
+
+
+2. 在应用注册表INSTALLED_APPS中加入xadmin应用。
+
+    INSTALLED_APPS = [
+       ....
+
+       'xadmin',
+       'crispy_forms',
+    ]
+
+
+   数据迁移：
+    python manage.py  makemigrations
+    python manage.py   migrate
+
+     python manage.py createsuperuser
+
+
+3.  在主工程的urls.py中加入xadmin应用的主入口。
+
+    url(r'^xadmin/', xadmin.site.urls),  #管理后台xadmin入口
+
+
+
+4. 在应用admin.py中加入xadmin页面风格和models定制化的admin类
+    from django.contrib import admin
+
+    # Register your models here.
+
+    from books.models import Tag, Art, Chapter
+    from xadmin import views
+
+    import xadmin
+
+    class BaseSetting(object):
+        # 主题修改
+        enable_themes = True
+        use_bootswatch = True
+
+    class GlobalSettings(object):
+        #整体配置
+        site_title = '小说电商平台管理系统'
+        site_footer = '武汉1804班级合作'
+        menu_style = 'accordion'    #菜单折叠
+
+
+    class TagAdmin(object):
+       '''
+        TagAdmin是对Tag models类进行的前端自定制
+       '''
+
+       #后台列表显示列
+       list_display = ['t_name', 't_info', 't_createtime', 't_flag']
+       # 后台列表查询条件
+       search_fields = ['t_name', 't_createtime']
+       # 后台列表通过时间查询
+       list_filter = ['t_name', 't_info', 't_createtime']
+       list_per_page = 5
+
+
+
+    class ArtAdmin(object):
+       # 后台列表显示列
+       list_display = ['a_title', 'a_info', 'a_content', 'a_img', 'a_createtime']
+       # 后台列表查询条件
+       search_fields = ['a_title', 'a_info', 'a_content']
+       # 后台列表通过时间查询
+       list_filter = ['a_title', 'a_info', 'a_content', 'a_createtime']
+       list_per_page = 20
+
+
+
+    xadmin.site.register(views.CommAdminView, GlobalSettings)
+    xadmin.site.register(views.BaseAdminView, BaseSetting)
+
+
+
+    xadmin.site.register(Tag, TagAdmin)
+    xadmin.site.register(Art, ArtAdmin)
+
+
+ 说明：
+   修改apps.py中加入verbose_name
+   并且在__init__.py中加入 default_app_config = "应用.apps.应用Config"
+
+
+
+
+5. 启动服务
+   登陆xadmin操作。
+
